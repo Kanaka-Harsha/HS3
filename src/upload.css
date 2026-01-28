@@ -1,0 +1,10 @@
+.upload1
+{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:column;
+    gap:20px;
+    width:100%;
+    border:2px solid white;
+}
