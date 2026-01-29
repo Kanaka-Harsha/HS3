@@ -42,7 +42,6 @@ function Upload()
         try {
             setStatus({ message: "Requesting upload URL...", color: "blue" });
             
-            // 1. Request the pre-signed URL
             const lambdaResponse = await fetch('https://2wb91iw6gk.execute-api.us-east-1.amazonaws.com/s3uploader', {
                 method: 'POST',
                 headers: {
@@ -50,7 +49,8 @@ function Upload()
                 },
                 body: JSON.stringify({
                     filename: selectedFile.name,
-                    content_type: selectedFile.type
+                    content_type: selectedFile.type,
+                    file_size: (selectedFile.size / (1024 * 1024)).toFixed(2)
                 }),
             });
 
