@@ -2,27 +2,6 @@ import { useState } from 'react';
 
 function Upload()
 {
-    /* 
-    // OLD CODE - COMMENTED AS REQUESTED
-    const uploadFile = () =>
-    {
-        const inputFile=document.getElementByClassName("fileInput");
-        const status=document.getElementByclassName("status");
-
-        if(!inputFile.files.length)
-        {
-            status.innertext="Please Select A File";
-            status.style.color="red";
-            return;
-        }
-        else
-        {
-            status.innerText="File Uploaded Successfully";
-            status.style.color="green";
-        }
-    }
-    */
-
     const [selectedFile, setSelectedFile] = useState(null);
     const [status, setStatus] = useState({ message: '', color: '' });
 
