@@ -1,15 +1,44 @@
-#container
-{
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction:column;
-    height:100%;
-    width:100%;
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
 }
-.header
-{
-    text-align: center;
-    color:white;
-    width:100%;
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--primary);
+  font-weight: 500;
 }

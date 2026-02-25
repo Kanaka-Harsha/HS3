@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Upload from './upload'
 import Login from './login'
 import NavBar from './navbar'
+import DataDisplayerCard from './dataDisplayerCard'
 import './App.css'
 
 function App() {
@@ -9,6 +10,40 @@ function App() {
   const [isLoggedin, setIsLoggedIn] = useState(() => {
     return localStorage.getItem("isLoggedin") === "true";
   });
+
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const fetchFiles = async (delay = 0) => {
+    if (!isLoggedin) return;
+    
+    if (delay > 0) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('https://hbriggwyii.execute-api.us-east-1.amazonaws.com/hs3API/s3Uploader');
+      if (response.ok) {
+        const data = await response.json();
+        setFiles(Array.isArray(data) ? data : (data.files || []));
+      } else {
+        const errorText = await response.text();
+        console.error(`Failed to fetch files. Status: ${response.status}. Error: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Network error fetching files:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedin) {
+      fetchFiles();
+    }
+  }, [isLoggedin]);
 
   const handleLogin = () => {
     localStorage.setItem("isLoggedin", "true");
@@ -18,19 +53,78 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("isLoggedin");
     setIsLoggedIn(false);
+    setFiles([]);
+  };
+
+  const handleDeleteFile = async (filename) => {
+    if (window.confirm(`Are you sure you want to delete ${filename}?`)) {
+      try {
+        const lambdaResponse = await fetch('https://hbriggwyii.execute-api.us-east-1.amazonaws.com/hs3API/s3Deleter', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename,
+                }),
+            });
+        if (lambdaResponse.ok) {
+            alert("Successfully deleted " + filename);
+            fetchFiles(2000); // 2 second delay to allow for DynamoDB trigger
+        } else {
+            const errorText = await lambdaResponse.text();
+            let errorMessage = "Unknown error";
+            try {
+                const errorData = JSON.parse(errorText);
+                errorMessage = errorData.message || errorData.body || errorText;
+            } catch (e) {
+                errorMessage = errorText || "Unknown error";
+            }
+            console.error("Delete failed:", errorMessage);
+            alert("Failed to delete file: " + errorMessage);
+        }
+      } catch (error) {
+        console.error("Error deleting file:", error);
+      }
+    }
   };
 
   return (
-    <div id="container">
-      <NavBar />
+    <div id="root">
+      <NavBar isLoggedin={isLoggedin} onLogout={handleLogout} />
       
       {isLoggedin ? (
-        <>
-          <Upload />
-          <button onClick={handleLogout}>
-             Log Out
-          </button>
-        </>
+        <div className="app-container">
+          <div className="dashboard">
+            <section className="upload-section-redesigned">
+              <Upload onUploadSuccess={() => fetchFiles(3000)} />
+            </section>
+
+            <section className="storage-section">
+              <h2 className="section-title">My Storage</h2>
+              {loading ? (
+                <div className="loading-state">Loading your files...</div>
+              ) : (
+                <div className="file-grid">
+                  {files.length > 0 ? (
+                    files.map((file, index) => (
+                      <DataDisplayerCard 
+                        key={index} 
+                        file={file} 
+                        onDelete={handleDeleteFile} 
+                      />
+                    ))
+                  ) : (
+                    <div className="empty-state">
+                      <p>No files found in your drive.</p>
+                      <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>Upload something to get started!</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
+        </div>
       ) : (
         <Login onLogin={handleLogin} />
       )}
