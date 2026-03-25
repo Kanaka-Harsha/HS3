@@ -24,7 +24,7 @@ function App() {
 
     setLoading(true);
     try {
-      const response = await fetch('https://hbriggwyii.execute-api.us-east-1.amazonaws.com/hs3API/s3Uploader');
+      const response = await fetch('YOUR API KEY');
       if (response.ok) {
         const data = await response.json();
         setFiles(Array.isArray(data) ? data : (data.files || []));
@@ -59,7 +59,7 @@ function App() {
   const handleDeleteFile = async (filename) => {
     if (window.confirm(`Are you sure you want to delete ${filename}?`)) {
       try {
-        const lambdaResponse = await fetch('https://hbriggwyii.execute-api.us-east-1.amazonaws.com/hs3API/s3Deleter', {
+        const lambdaResponse = await fetch('YOUR API KEY', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
