@@ -1,4 +1,4 @@
-# 🛡️ H-Drive: Secure Serverless Cloud Storage
+# 🛡️ H-Drive: Secure Serverless Cloud Storage -> (Currently A MVP)
 
 
 **H-Drive** is a modern, serverless cloud storage solution designed to provide a secure and efficient way to store, manage, and access files in the cloud. Built with a React frontend and an AWS-powered backend, it leverages the scalability and security of industry-leading cloud services.
